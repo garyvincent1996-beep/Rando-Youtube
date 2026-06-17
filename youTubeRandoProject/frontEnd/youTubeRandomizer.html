@@ -1,0 +1,92 @@
+<html>
+<doctype html>
+<head>
+<title>Youtube Rando</title> 
+
+<style>
+
+input[type="search"] {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  width: 250px;
+}
+
+input[type="number"] {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  width: 100px;
+}
+
+button {
+  padding: 10px 15px;
+  background-color: #ff0000;
+  color: white;
+  border: 1px solid #000000;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+h1{
+    font-family: arial,sans-serif;
+    font-size: 25px;
+}
+
+#result {
+    margin-top: 20px;
+    font-family: arial,sans-serif;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>Random Youtube Search and Watch</h1>
+
+<form id="searchForm">
+  <input type="search" id="site-search" name="q" placeholder="Search..." aria-label="Search through site content">
+  <input type="number" id="target" name="target" placeholder="Minutes" value="10">
+  <button type="submit">Search</button>
+</form>
+
+<div id="result"></div>
+
+<script>
+document.getElementById('searchForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const query = document.getElementById('site-search').value;
+    const target = document.getElementById('target').value;
+    const resultDiv = document.getElementById('result');
+
+    if (!query) {
+        resultDiv.innerHTML = '<p>Please enter a search query.</p>';
+        return;
+    }
+
+    resultDiv.innerHTML = '<p>Searching...</p>';
+
+    fetch(`/search?q=${encodeURIComponent(query)}&target=${target}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                resultDiv.innerHTML = `<p>Error: ${data.error}</p>`;
+            } else {
+                resultDiv.innerHTML = `
+                    <h2>Random pick:</h2>
+                    <p><strong>Title:</strong> ${data.title}</p>
+                    <p><strong>Length:</strong> ${data.length}</p>
+                    <p><strong>Link:</strong> <a href="${data.url}" target="_blank">${data.url}</a></p>
+                `;
+            }
+        })
+        .catch(error => {
+            resultDiv.innerHTML = '<p>An error occurred. Please try again.</p>';
+        });
+});
+</script>
+
+</body>
+</html>
